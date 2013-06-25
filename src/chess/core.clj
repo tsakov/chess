@@ -1,7 +1,10 @@
 (ns chess.core
+  (:use chess.drawer
+        chess.board)
   (:gen-class))
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Start a new game."
   [& args]
-  (println "Hello, World!"))
+  (init-board)
+  (draw-board))
