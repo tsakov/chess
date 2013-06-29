@@ -1,15 +1,37 @@
 (ns chess.move
   (:use chess.board))
 
+(def turn (atom :white))
+(defn next-turn []
+  (swap! turn #(if (= % :white) :black :white)))
+
 (def selected-pos (atom nil))
-(defn get-setlected-pos [] @selected-pos)
-(defn set-selected-pos [x y] (reset! selected-pos [x y]))
+
+(declare move)
+(declare log-move)
+
+(defn set-selected-pos [x y]
+  (let [[figure color] (board-get x y)
+        old-pos @selected-pos]
+    (if old-pos
+        (if (= old-pos [x y])
+            (reset! selected-pos nil)
+            (move old-pos [x y]))
+        (if (= color @turn)
+            (do (reset! selected-pos [x y]) nil)
+            "It's not your turn!"))))
 
 (defn move [from to]
   (let [[x y] from
         [x1 y1] to
         [figure color] (board-get x y)]
-    (println color figure from "->" to)
+    (log-move from to)
     (board-remove x y)
     (board-remove x1 y1)
-    (board-add x1 y1 figure color)))
+    (board-add x1 y1 figure color)
+    (next-turn)
+    (reset! selected-pos nil)))
+
+(defn log-move [from to]
+  (let [[figure color] (apply board-get from)]
+    (println color figure from "->" to)))
