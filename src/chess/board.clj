@@ -13,6 +13,9 @@
 (defn board-add [x y type color]
   (swap! board assoc [x y] [type color]))
 
+(defn board-get-pieces []
+  @board)
+
 (defn init-board []
   (doseq [x (range 8)]
     (board-add x 1 :pawn :white)

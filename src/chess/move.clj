@@ -1,5 +1,6 @@
 (ns chess.move
-  (:use chess.board))
+  (:use chess.board
+        chess.validator))
 
 (def turn (atom :white))
 (defn next-turn []
@@ -16,7 +17,11 @@
     (if old-pos
         (if (= old-pos [x y])
             (reset! selected-pos nil)
-            (move old-pos [x y]))
+            (if (valid-move (first old-pos) (second old-pos) x y (first (apply board-get old-pos)) (second (apply board-get old-pos)))
+                (move old-pos [x y])
+                (do
+                  (reset! selected-pos nil)
+                  "This is not a valid move!")))
         (if (= color @turn)
             (do (reset! selected-pos [x y]) nil)
             "It's not your turn!"))))
