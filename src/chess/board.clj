@@ -26,6 +26,7 @@
     piece-info))
 
 (defn init-board []
+  (reset! board {})
   (doseq [x (range 8)]
     (board-add x 1 :pawn :white)
     (board-add x 6 :pawn :black))

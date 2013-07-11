@@ -2,14 +2,15 @@
   (:use chess.board
         chess.validator))
 
+(declare move)
+(declare log-move)
+
 (def turn (atom :white))
+
 (defn next-turn []
   (swap! turn #(if (= % :white) :black :white)))
 
 (def selected-pos (atom nil))
-
-(declare move)
-(declare log-move)
 
 (defn set-selected-pos [x y]
   (let [{:keys [type color]} (board-get x y)

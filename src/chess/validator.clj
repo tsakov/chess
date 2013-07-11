@@ -58,6 +58,15 @@
         m (min dx dy)]
     (<= -1 m M 1)))
 
+(defn validate-move [from to]
+  (let [[x y] from
+        [x1 y1] to
+        {:keys [type color]} (board-get x y)
+        {color1 :color} (board-get x1 y1)]
+    (and (not= from to)
+         (not= color color1)
+         (valid-move? x y x1 y1 type color))))
+
 (defn threatens? [from to]
   (let [[x1 y1] from
         [x2 y2] to
@@ -69,24 +78,20 @@
 
 (defn get-king-pos [color]
   (->> (board-get-pieces)
-       (filter #(= (second %) [:king color]))
+       (filter #(= ((juxt :type :color) %)
+                   [:king color]))
        first
-       first))
+       :pos))
 
 (defn check? [color]
   (let [king-pos (get-king-pos color)
         all-pos (for [x (range 8) y (range 8)] [x y])]
     (some #(threatens? % king-pos) all-pos)))
 
-(defn checkmate? [color])
+(defn checkmate? [color]
+  (and (check? color)
+       "no legal moves"))
 
-(defn stalemate? [color])
-
-(defn validate-move [from to]
-  (let [[x y] from
-        [x1 y1] to
-        {:keys [type color]} (board-get x y)
-        {color1 :color} (board-get x1 y1)]
-    (and (not= from to)
-         (not= color color1)
-         (valid-move? x y x1 y1 type color))))
+(defn stalemate? [color]
+  (and (not (check? color))
+       "no legal moves"))
