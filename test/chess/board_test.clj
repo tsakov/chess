@@ -2,18 +2,15 @@
   (:use clojure.test
         chess.board))
 
-(reset! board {[0 0] [:pawn :black]
-               [1 1] [:king :white]})
-
 (deftest access-board
   (testing "board-get"
-    (is (= (board-get 0 0)
-           [:pawn :black]))
-    (is (nil? (board-get -1 -1))))
-  (testing "board-remove"
-    (is (= (board-remove 0 0)
-           {[1 1] [:king :white]})))
+    (is (nil? (board-get 0 0))))
   (testing "board-add"
-    (is (= (board-add 2 2 :rook :black)
-           {[1 1] [:king :white]
-            [2 2] [:rook :black]}))))
+    (board-add 0 0 :king :black)
+    (is (= (board-get 0 0)
+           {:pos [0 0]
+            :type :king
+            :color :black})))
+  (testing "board-remove"
+    (board-remove 0 0)
+    (is (nil? (board-get 0 0)))))

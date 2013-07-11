@@ -10,10 +10,10 @@
 (def canvas-size (* square-size 8))
 (def board-colors ["#CD853F" "#F5DEB3"])
 
-(defn image-name [figure color]
+(defn image-name [type color]
   (str "resources/"
        (first (name color))
-       (name figure)
+       (name type)
        ".png"))
 
 (defn painter [c g]
@@ -24,8 +24,8 @@
                 y1 (* (- 7 y) square-size)]]
     (draw g
       (rect x1 y1 square-size) (style :background bg))
-    (if-let [[figure color] (board-get x y)]
-      (let [img (-> (image-name figure color) File. ImageIO/read)]
+    (if-let [{:keys [type color]} (board-get x y)]
+      (let [img (-> (image-name type color) File. ImageIO/read)]
         (.drawImage g img x1 y1 nil))))
   (if-let [[x y] @selected-pos]
     (let [x1 (* x square-size)

@@ -1,7 +1,7 @@
 (ns chess.board)
 
 (def board
-  "{[:x :y] [:type :color] & more}"
+  ;{[:x :y] [:type :color] & more}
   (atom {}))
 
 (defn board-get [x y]
