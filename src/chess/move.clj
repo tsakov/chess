@@ -24,7 +24,8 @@
                   "This is not a valid move!")))
         (if (= color @turn)
             (do (reset! selected-pos [x y]) nil)
-            "It's not your turn!"))))
+            (if (not (nil? color))
+                "It's not your turn!")))))
 
 (defn move [from to]
   (let [[x y] from
@@ -38,5 +39,5 @@
     (reset! selected-pos nil)))
 
 (defn log-move [from to]
-  (let [[figure color] (apply board-get from)]
+  (let [[figure color] (->> from (apply board-get) (map name))]
     (println color figure from "->" to)))

@@ -1,4 +1,4 @@
-(ns chess.board-test
+(ns chess.validator-test
   (:use clojure.test
         chess.validator))
 

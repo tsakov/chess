@@ -64,8 +64,13 @@
          (<= -1 m M 1))))
 
 (defn threatens? [from to]
-  "valid move \" from -> to \" and different colors"
-  )
+  (let [[x1 y1] from
+        [x2 y2] to
+        [fig1 color1] (apply board-get from)
+        [fig2 color2] (apply board-get to)]
+    (and (not (nil? fig1))
+         (valid-move x1 y1 x2 y2 fig1 color1)
+         (= (set [color1 color2]) #{:white :black}))))
 
 (defn get-king-pos [color]
   (->> (board-get-pieces)
@@ -74,8 +79,9 @@
        first))
 
 (defn check? [color]
-  ""
-  )
+  (let [king-pos (get-king-pos color)
+        all-pos (for [x (range 8) y (range 8)] [x y])]
+    (some #(threatens? % king-pos) all-pos)))
 
 (defn checkmate? [color])
 
