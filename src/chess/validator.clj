@@ -51,7 +51,16 @@
   (or (valid-move? x y x1 y1 :rook color)
       (valid-move? x y x1 y1 :bishop color)))
 
+(declare get-king-pos)
+(declare close-enough?)
+
 (defmethod valid-move? :king [x y x1 y1 type color]
+  (let [other-color (if (= color :white) :black :white)
+        [x2 y2] (get-king-pos other-color)]
+    (and (close-enough? x y x1 y1)
+         (not (close-enough? x1 y1 x2 y2)))))
+
+(defn close-enough? [x y x1 y1]
   (let [dx (- x1 x)
         dy (- y1 y)
         M (max dx dy)
@@ -88,10 +97,43 @@
         all-pos (for [x (range 8) y (range 8)] [x y])]
     (some #(threatens? % king-pos) all-pos)))
 
+(defn generate-valid-moves [color]
+  (let [all-pos (for [x (range 8) y (range 8)] [x y])
+        color-pos (->> (board-get-pieces)
+                       (filter #(= (:color %) color))
+                       (map :pos))
+        all-moves (for [from color-pos to all-pos] [from to])
+        valid-moves (filter #(apply validate-move %) all-moves)]
+    valid-moves))
+
+(defn move-quiet [from to]
+  (let [[x y] from
+        [x1 y1] to
+        {:keys [type color]} (board-get x y)]
+    (board-remove x y)
+    (board-remove x1 y1)
+    (board-add x1 y1 type color)))
+
+(defn legal-move? [from to]
+  (let [backup (board-backup)]
+    (move-quiet from to)
+    (let [legal? (->> to
+                      (apply board-get)
+                      :color
+                      check?
+                      not)]
+      (board-restore backup)
+      legal?)))
+
+(defn exist-legal-moves? [color]
+  (let [valid-moves (generate-valid-moves color)]
+    (some #(apply legal-move? %) valid-moves)))
+
 (defn checkmate? [color]
-  (and (check? color)
-       "no legal moves"))
+  (let [backup (board-backup)]
+    (and (check? color)
+         (not (exist-legal-moves? color)))))
 
 (defn stalemate? [color]
   (and (not (check? color))
-       "no legal moves"))
+       (not (exist-legal-moves? color))))

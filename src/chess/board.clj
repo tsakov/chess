@@ -36,6 +36,9 @@
           [y color] [[0 :white] [7 :black]]]
     (board-add x y type color)))
 
+(defn board-reset []
+  (reset! board {}))
+
 (defn board-backup []
   @board)
 
