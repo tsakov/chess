@@ -56,7 +56,7 @@
 
 (declare get-king-pos)
 (declare close-enough?)
-(declare legal-move?)
+(declare safe-move?)
 
 (defmethod valid-move? :king [x y x1 y1 type color]
   (let [other-color (opposite-color color)
@@ -79,7 +79,7 @@
     (and (not= from to)
          (not= color color1)
          (valid-move? x y x1 y1 type color)
-         (legal-move? from to))))
+         (safe-move? from to))))
 
 (defn threatens? [from to]
   (let [[x1 y1] from
@@ -119,26 +119,26 @@
     (board-remove x1 y1)
     (board-add x1 y1 type color)))
 
-(defn legal-move? [from to]
+(defn safe-move? [from to]
   (let [backup (board-backup)]
     (move-quiet from to)
-    (let [legal? (->> to
-                      (apply board-get)
-                      :color
-                      check?
-                      not)]
+    (let [safe? (->> to
+                     (apply board-get)
+                     :color
+                     check?
+                     not)]
       (board-restore backup)
-      legal?)))
+      safe?)))
 
-(defn exist-legal-moves? [color]
+(defn exist-safe-moves? [color]
   (let [valid-moves (generate-valid-moves color)]
-    (some #(apply legal-move? %) valid-moves)))
+    (some #(apply safe-move? %) valid-moves)))
 
 (defn checkmate? [color]
   (let [backup (board-backup)]
     (and (check? color)
-         (not (exist-legal-moves? color)))))
+         (not (exist-safe-moves? color)))))
 
 (defn stalemate? [color]
   (and (not (check? color))
-       (not (exist-legal-moves? color))))
+       (not (exist-safe-moves? color))))
