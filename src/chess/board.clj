@@ -35,3 +35,9 @@
                             :king :bishop :knight :rook])
           [y color] [[0 :white] [7 :black]]]
     (board-add x y type color)))
+
+(defn board-backup []
+  @board)
+
+(defn board-restore [backup]
+  (reset! board backup))

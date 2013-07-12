@@ -13,4 +13,12 @@
             :color :black})))
   (testing "board-remove"
     (board-remove 0 0)
-    (is (nil? (board-get 0 0)))))
+    (is (nil? (board-get 0 0))))
+  (testing "board-backup"
+    (board-add 0 0 :knight :black)
+    (let [old (board-get-pieces)
+          backup (board-backup)]
+      (board-remove 0 0)
+      (board-restore backup)
+      (is (= (board-get-pieces)
+             old)))))
