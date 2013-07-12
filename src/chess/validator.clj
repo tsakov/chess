@@ -23,6 +23,9 @@
 (defn free-path? [from to]
   (every? free? (generate-path from to)))
 
+(defn opposite-color [color]
+  (if (= color :white) :black :white))
+
 (defmethod valid-move? :pawn [x y x1 y1 type color]
   (or (and (= x x1) (= (inc y) y1) (= color :white) (free? [x1 y1]))
       (and (= x x1) (= (dec y) y1) (= color :black) (free? [x1 y1]))
@@ -53,9 +56,10 @@
 
 (declare get-king-pos)
 (declare close-enough?)
+(declare legal-move?)
 
 (defmethod valid-move? :king [x y x1 y1 type color]
-  (let [other-color (if (= color :white) :black :white)
+  (let [other-color (opposite-color color)
         [x2 y2] (get-king-pos other-color)]
     (and (close-enough? x y x1 y1)
          (not (close-enough? x1 y1 x2 y2)))))
@@ -74,7 +78,8 @@
         {color1 :color} (board-get x1 y1)]
     (and (not= from to)
          (not= color color1)
-         (valid-move? x y x1 y1 type color))))
+         (valid-move? x y x1 y1 type color)
+         (legal-move? from to))))
 
 (defn threatens? [from to]
   (let [[x1 y1] from

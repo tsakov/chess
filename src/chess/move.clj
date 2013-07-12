@@ -8,7 +8,7 @@
 (def turn (atom :white))
 
 (defn next-turn []
-  (swap! turn #(if (= % :white) :black :white)))
+  (swap! turn opposite-color))
 
 (def selected-pos (atom nil))
 
@@ -19,7 +19,11 @@
         (if (= old-pos [x y])
             (reset! selected-pos nil)
             (if (validate-move old-pos [x y])
-                (move old-pos [x y])
+                (do
+                  (move old-pos [x y])
+                  (cond (checkmate? @turn) "Checkmate!"
+                        (stalemate? @turn) "Stalemate!"
+                        (check? @turn) "Check!"))
                 (do
                   (reset! selected-pos nil)
                   "This is not a valid move!")))

@@ -39,6 +39,8 @@
         message (set-selected-pos x y)]
     (if message
         (alert e message))
+    (if (#{"Checkmate!" "Stalemate!"} message)
+        (System/exit 0))
     (-> e .getComponent .repaint)))
 
 (defn draw-board []
