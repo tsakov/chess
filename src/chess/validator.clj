@@ -1,8 +1,6 @@
 (ns chess.validator
   (:use chess.board))
 
-(defmulti valid-move? (fn [x y x1 y1 type color] type))
-
 (defn free? [pos]
   (nil? (apply board-get pos)))
 
@@ -26,17 +24,19 @@
 (defn opposite-color [color]
   (if (= color :white) :black :white))
 
-(defmethod valid-move? :pawn [x y x1 y1 type color]
+(defmulti legal-move? (fn [x y x1 y1 type color] type))
+
+(defmethod legal-move? :pawn [x y x1 y1 type color]
   (or (and (= x x1) (= (inc y) y1) (= color :white) (free? [x1 y1]))
       (and (= x x1) (= (dec y) y1) (= color :black) (free? [x1 y1]))
       (and (or (= (dec x) x1) (= (inc x) x1)) (= (inc y) y1) (= color :white) (= (:color (board-get x1 y1)) :black))
       (and (or (= (dec x) x1) (= (inc x) x1)) (= (dec y) y1) (= color :black) (= (:color (board-get x1 y1)) :white))))
 
-(defmethod valid-move? :rook [x y x1 y1 type color]
+(defmethod legal-move? :rook [x y x1 y1 type color]
   (and (or (= x x1) (= y y1))
        (free-path? [x y] [x1 y1])))
 
-(defmethod valid-move? :knight [x y x1 y1 type color]
+(defmethod legal-move? :knight [x y x1 y1 type color]
   (let [all (for [x [1 2]
                   :let [y (- 3 x)]
                   dx [-1 1]
@@ -44,21 +44,21 @@
               [(* x dx) (* y dy)])]
     ((set (map #(map + [x y] %) all)) [x1 y1])))
 
-(defmethod valid-move? :bishop [x y x1 y1 type color]
+(defmethod legal-move? :bishop [x y x1 y1 type color]
   (and (free-path? [x y] [x1 y1])
        (not= y y1)
        (let [k (/ (- x x1) (- y y1))]
          (= 1 (* k k)))))
 
-(defmethod valid-move? :queen [x y x1 y1 type color]
-  (or (valid-move? x y x1 y1 :rook color)
-      (valid-move? x y x1 y1 :bishop color)))
+(defmethod legal-move? :queen [x y x1 y1 type color]
+  (or (legal-move? x y x1 y1 :rook color)
+      (legal-move? x y x1 y1 :bishop color)))
 
 (declare get-king-pos)
 (declare close-enough?)
 (declare safe-move?)
 
-(defmethod valid-move? :king [x y x1 y1 type color]
+(defmethod legal-move? :king [x y x1 y1 type color]
   (let [other-color (opposite-color color)
         [x2 y2] (get-king-pos other-color)]
     (and (close-enough? x y x1 y1)
@@ -78,7 +78,7 @@
         {color1 :color} (board-get x1 y1)]
     (and (not= from to)
          (not= color color1)
-         (valid-move? x y x1 y1 type color)
+         (legal-move? x y x1 y1 type color)
          (safe-move? from to))))
 
 (defn threatens? [from to]
@@ -87,7 +87,7 @@
         {type1 :type color1 :color} (apply board-get from)
         {type2 :type color2 :color} (apply board-get to)]
     (and (not (nil? type1))
-         (valid-move? x1 y1 x2 y2 type1 color1)
+         (legal-move? x1 y1 x2 y2 type1 color1)
          (= (set [color1 color2]) #{:white :black}))))
 
 (defn get-king-pos [color]
