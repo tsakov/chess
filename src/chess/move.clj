@@ -19,18 +19,17 @@
         (if (= old-pos [x y])
             (reset! selected-pos nil)
             (if (validate-move old-pos [x y])
-                (do
-                  (move old-pos [x y])
-                  (cond (checkmate? @turn) "Checkmate!"
-                        (stalemate? @turn) "Stalemate!"
-                        (check? @turn) "Check!"))
-                (do
-                  (reset! selected-pos nil)
-                  "This is not a valid move!")))
+                (do (move old-pos [x y])
+                    (cond (checkmate? @turn) "Checkmate!"
+                          (stalemate? @turn) "Stalemate!"
+                          (check? @turn) "Check!"))
+                (do (reset! selected-pos nil)
+                    "This is not a valid move!")))
         (if (= color @turn)
-            (do (reset! selected-pos [x y]) nil)
-            (if (not (nil? color))
-                "It's not your turn!")))))
+            (do (reset! selected-pos [x y])
+                nil)
+            (if-not (nil? color)
+                    "It's not your turn!")))))
 
 (defn move [from to]
   (let [[x y] from

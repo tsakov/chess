@@ -37,12 +37,14 @@
        (free-path? [x y] [x1 y1])))
 
 (defmethod legal-move? :knight [x y x1 y1 type color]
-  (let [all (for [x [1 2]
-                  :let [y (- 3 x)]
-                  dx [-1 1]
-                  dy [-1 1]]
-              [(* x dx) (* y dy)])]
-    ((set (map #(map + [x y] %) all)) [x1 y1])))
+  (let [deltas (for [x [1 2]
+                     :let [y (- 3 x)]
+                     dx [-1 1]
+                     dy [-1 1]]
+                 [(* x dx) (* y dy)])
+        all-valid (set (map #(map + [x y] %)
+                            deltas))]
+    (all-valid [x1 y1])))
 
 (defmethod legal-move? :bishop [x y x1 y1 type color]
   (and (free-path? [x y] [x1 y1])
@@ -88,7 +90,8 @@
         {type2 :type color2 :color} (apply board-get to)]
     (and (not (nil? type1))
          (legal-move? x1 y1 x2 y2 type1 color1)
-         (= (set [color1 color2]) #{:white :black}))))
+         (= (set [color1 color2])
+            #{:white :black}))))
 
 (defn get-king-pos [color]
   (->> (board-get-pieces)
