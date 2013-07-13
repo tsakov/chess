@@ -25,8 +25,11 @@
         :when piece-info]
     piece-info))
 
+(defn board-reset []
+  (reset! board {}))
+
 (defn init-board []
-  (reset! board {})
+  (board-reset)
   (doseq [x (range 8)]
     (board-add x 1 :pawn :white)
     (board-add x 6 :pawn :black))
@@ -35,9 +38,6 @@
                             :king :bishop :knight :rook])
           [y color] [[0 :white] [7 :black]]]
     (board-add x y type color)))
-
-(defn board-reset []
-  (reset! board {}))
 
 (defn board-backup []
   @board)

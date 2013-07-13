@@ -57,4 +57,8 @@
     (board-add 3 4 :queen :white)
     (board-add 4 4 :bishop :white)
     (board-add 2 7 :king :black)
-    (is (stalemate? :black))))
+    (is (stalemate? :black)))
+  (testing "type-moves"
+    (init-board)
+    (is (validate-move [1 0] [0 2]))
+    (is (validate-move [0 1] [0 2]))))
